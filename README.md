@@ -1,6 +1,7 @@
-# ROS 2 Jazzy — Comunicação entre Nodes com Python
+# Curso ROS 2 Jazzy
 
-Este repositório registra, em ordem cronológica, o desenvolvimento do curso de ROS 2.
+Este repositório registra, em ordem cronológica, o desenvolvimento do curso de ROS 2, lembrando que nem todo o curso estará aqui no README, tentarei pôr o que me parece importante.
+Também não irei mostrar passos feitos anteriormente, como mostrar uma criação de nó novo, apenas direi que criei aquele nó e dizer sua funcionalidade.
 
 O desenvolvimento foi realizado com ROS 2 Jazzy em um container Docker, utilizando o VS Code para edição dos arquivos e terminais separados.
 
@@ -50,9 +51,9 @@ A implementação utiliza a classe `RobotNewsStationNode`, que herda de `Node`. 
 
 O Timer agenda o método `publish_news()` a cada 0,5 segundo. A cada chamada, uma mensagem `String` é criada, seu campo `data` recebe o texto `Hello` e a mensagem é publicada no Topic `robot_news`.
 
-![Implementação do RobotNewsStationNode](images/07-implementacao-do-publisher.jpg)
-
 Como o Publisher utiliza o tipo `String` de `example_interfaces`, essa dependência foi declarada no `package.xml`.
+
+![Implementação do RobotNewsStationNode](images/07-implementacao-do-publisher.jpg)
 
 ![Dependência example_interfaces no package.xml](images/08-dependencia-no-package-xml.jpg)
 
@@ -126,16 +127,59 @@ O remapeamento `__node` altera o nome de cada instância sem modificar o código
 A comunicação ficou organizada em dois grupos:
 
 ```text
- robot_1 ──────┐                         ┌──── smartphone_1
-               ├──── /robot_news ────────┤
- robot_2 ──────┘                         └──── smartphone_2
+robot_1 ──────┐                         ┌──── smartphone_1
+              ├──── /robot_news ────────┤
+robot_2 ──────┘                         └──── smartphone_2
 
- robot_3 ─────────── /robot_news_2 ─────────── smartphone_3
+robot_3 ─────────── /robot_news_2 ─────────── smartphone_3
 ```
 
 Os dois Publishers conectados a `/robot_news` publicam no mesmo canal, e os dois Subscribers inscritos nesse Topic podem receber mensagens de ambos. Já `/robot_news_2` é utilizado pela terceira dupla, mantendo esse fluxo separado do primeiro.
 
 ![Grafo dos Nodes e tópicos remapeados no rqt_graph](images/17-rqt-graph-com-remapeamento.jpg)
+
+## 8. Atividade Prática 02: comunicação com tópicos e contador acumulador
+
+Nesta atividade, foi implementado um sistema com dois Nodes que se comunicam por meio de Topics. O primeiro Node publica periodicamente um valor inteiro fixo, enquanto o segundo recebe esse valor, acumula a soma e publica o resultado atualizado.
+
+A atividade utiliza o tipo de mensagem `example_interfaces/msg/Int64` e estabelece o seguinte fluxo:
+
+```text
+/number_publisher  →  /number  →  /number_counter  →  /number_count
+     Publisher          Topic        Subscriber/Publisher      Topic
+```
+
+### 8.1. Node `number_publisher`
+
+Foi criado o Node `number_publisher`, responsável por publicar o valor inteiro `2` no Topic `number`. Para isso, foi utilizado um Publisher do tipo `Int64` e um Timer configurado para chamar o método `publish_number()` a cada segundo.
+
+A cada chamada do método, uma mensagem `Int64` é criada, seu campo `data` recebe o valor `2` e a mensagem é publicada no Topic `number`.
+
+![Código do Node number_publisher](images/19-codigo-number-publisher.jpg)
+
+### 8.2. Node `number_counter`
+
+Também foi criado o Node `number_counter`, que possui um Subscriber no Topic `number` e um Publisher no Topic `number_count`, ambos utilizando mensagens do tipo `Int64`.
+
+A variável `contador` é inicializada com o valor `0`. Sempre que uma mensagem é recebida, o método `callback_number()` soma `msg.data` ao contador. Em seguida, uma nova mensagem `Int64` é criada com o total acumulado e publicada em `number_count`.
+
+Dessa forma, como o Publisher envia o valor `2` a cada segundo, o contador aumenta em duas unidades a cada mensagem recebida.
+
+![Código do Node number_counter](images/20-codigo-number-counter.jpg)
+
+### 8.3. Execução e verificação
+
+Os dois Nodes foram executados simultaneamente em terminais separados. Em um terceiro terminal, foi utilizado `ros2 topic echo /number_count` para acompanhar os valores publicados pelo contador.
+
+```bash
+ros2 run my_py_pkg number_publisher_executable
+ros2 run my_py_pkg number_counter_executable
+ros2 topic echo /number_count
+```
+
+Durante o trecho registrado, os valores observados foram `6`, `8`, `10`, `12`, `14`, `16`, `18` e `20`. A sequência confirma que o contador acumula o valor `2` recebido a cada publicação.
+
+![Execução dos Nodes number_publisher e number_counter e monitoramento de number_count](images/18-execucao-number-publisher-counter.jpg)
 
 ## Atualização do registro
 

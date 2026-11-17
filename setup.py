@@ -27,6 +27,8 @@ setup(
             'my_first_node_executable = my_py_pkg.my_first_node:main',
             'robot_news_station_executable = my_py_pkg.robot_news_station:main',
             'smartphone_executable = my_py_pkg.smartphone:main',
+            'number_publisher_executable = my_py_pkg.number_publisher:main',
+            'number_counter_executable = my_py_pkg.number_counter:main',
         ],
     },
 )
