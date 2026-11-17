@@ -49,7 +49,7 @@ A implementação utiliza a classe `RobotNewsStationNode`, que herda de `Node`. 
 | Timer | `0,5 segundo` (aproximadamente 2 Hz) |
 | Método de publicação | `publish_news()` |
 
-O Timer agenda o método `publish_news()` a cada 0,5 segundo. A cada chamada, uma mensagem `String` é criada, seu campo `data` recebe o texto `Hello` e a mensagem é publicada no Topic `robot_news`.
+O Timer agenda o método `publish_news()` a cada 0,5 segundo. A cada chamada, uma mensagem `String` é criada, seu campo `data` recebe o texto `Hi, this is R2-D2 bringing you the latest news!` e a mensagem é publicada no Topic `robot_news`.
 
 Como o Publisher utiliza o tipo `String` de `example_interfaces`, essa dependência foi declarada no `package.xml`.
 
